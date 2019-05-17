@@ -7,7 +7,8 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/third_party)
 # Add gtest
 ExternalProject_Add(
     googletest
-    URL http://googletest.googlecode.com/files/gtest-1.6.0.zip
+    GIT_REPOSITORY https://github.com/google/googletest
+    GIT_TAG release-1.6.0
     # Disable install step
     INSTALL_COMMAND ""
     # Wrap download, configure and build steps in a script to log output
@@ -28,7 +29,7 @@ set_property(TARGET ${GTEST_LIBRARY} PROPERTY IMPORTED_LOCATION
                 ${GTEST_LIBRARY_PATH} )
 add_dependencies(${GTEST_LIBRARY} googletest)
 
-# copy all .test to build directory 
+# copy all .test to build directory
 configure_file(attributesTest.test tests/attributesTest.test COPYONLY)
 configure_file(featureBondsetTest.test tests/featureBondsetTest.test COPYONLY)
 configure_file(featureBoxTest.test tests/featureBoxTest.test COPYONLY)
@@ -39,6 +40,7 @@ configure_file(molecules.test tests/molecules.test COPYONLY)
 configure_file(parserTest.test tests/parserTest.test COPYONLY)
 configure_file(readbfmfile.test tests/readbfmfile.test COPYONLY)
 configure_file(sc64CorruptedBfm.test tests/sc64CorruptedBfm.test COPYONLY)
+configure_file(WriteReadAdditionalBondsTest.bfm tests/WriteReadAdditionalBondsTest.bfm COPYONLY)
 #configure_file(tmpSolventTest.sol tests/tmpSolventTest.sol COPYONLY)
 
 # build and run LeMonaDE-tests

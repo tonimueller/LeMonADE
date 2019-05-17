@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -89,6 +89,14 @@ template<class IngredientsType, class ResultType>
 void writeResultFile(std::string filename,const IngredientsType& ingredients,
 		ResultType& results, std::string comment = "\n");
 
+/**
+ * @brief Appends all given results into a given stream as formatted output.
+ *
+ * @param filename Specify the name of the output-file.
+ * @param results List of results to format and write
+ */
+template<class ResultType>
+void appendToResultFile(std::string filename,ResultType& results);
 }
 
 
@@ -104,14 +112,14 @@ void ResultFormattingTools::writeTable(std::ostream& stream,
 	stream << commentStream.str() << std::endl;
 
 	//check if all column have the same size
-	int columnSize = results[0].size();
-	for (int i = 0; i < results.size(); ++i) {
+	size_t columnSize = results[0].size();
+	for (size_t i = 0; i < results.size(); ++i) {
 		if (results[i].size() != columnSize)
-			throw std::runtime_error("Columns do not have the same size\n");
+			throw std::runtime_error("ResultFormattingTools::writeTable():Columns do not have the same size\n");
 	}
 
-	for (int row = 0; row < results[0].size(); ++row) {
-		for (int column = 0; column < results.size(); ++column) {
+	for (size_t row = 0; row < results[0].size(); ++row) {
+		for (size_t column = 0; column < results.size(); ++column) {
 			stream << results[column][row] << "\t";
 		}
 		stream << std::endl;
@@ -128,7 +136,7 @@ void ResultFormattingTools::writeResultFile(std::string filename,const Ingredien
 
 	std::ofstream file;
 	file.open(filename.c_str());
-	
+
 	if(!file.is_open())
 		throw std::runtime_error("ResultFormattingTools::writeResultFile(): error opening output file"+filename+"\n");
 	std::stringstream contents;
@@ -142,6 +150,37 @@ void ResultFormattingTools::writeResultFile(std::string filename,const Ingredien
 	writeTable(contents, results, comment);
 
 	file << contents.str();
+
+	file.close();
+}
+
+template<class ResultType>
+void ResultFormattingTools::appendToResultFile(std::string filename,ResultType& results) {
+
+	std::ofstream file;
+	file.open(filename.c_str(),std::ios_base::app);
+
+	if(!file.is_open())
+		throw std::runtime_error("ResultFormattingTools::appendToResultFile(): error opening output file"+filename+"\n");
+
+	//check if all column have the same size
+	size_t columnSize = results[0].size();
+	for (size_t i = 0; i < results.size(); ++i) {
+		if (results[i].size() != columnSize){
+			std::stringstream errormessage;
+			errormessage<<"ResultFormattingTools::appendToResultFile():Columns do not have the same size\n";
+			errormessage<<"first colums size "<<columnSize<<" column no "<<i<<" size "<<results[i].size()<<std::endl;
+			throw std::runtime_error(errormessage.str());
+		}
+	}
+
+	//write content
+	for (size_t row = 0; row < results[0].size(); ++row) {
+		for (size_t column = 0; column < results.size(); ++column) {
+			file << results[column][row] << "\t";
+		}
+		file << std::endl;
+	}
 
 	file.close();
 }
